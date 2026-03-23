@@ -1,0 +1,10 @@
+button> Hello
+div cors=true smm=yes>
+	li> World
+	flow st=margin:20px>
+		p> Things can be
+		p> Good!
+	stack>
+		input>
+		p> D
+		input>
