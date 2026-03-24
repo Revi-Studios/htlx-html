@@ -15,15 +15,15 @@ import (
 // }
 
 func ParseTokens(tokens chan lexertoken.Token) (htlx.HtlxElement, error) {
-	output := htlx.HtlxElement{Type: "root"}
+	defer close(tokens)
+
+	result := htlx.HtlxElement{Type: "root"}
+	var token lexertoken.Token
+	token = <-tokens
 
 	for {
-		var token lexertoken.Token
 		var elem htlx.HtlxElement
-		var attributes [][2]t.Token
 		var tabs int
-
-		token = <-tokens
 
 		if token.Type == t.TOKEN_TAB {
 			tabs++
@@ -44,53 +44,59 @@ func ParseTokens(tokens chan lexertoken.Token) (htlx.HtlxElement, error) {
 		elem.Type = token.Value
 		token = <-tokens
 
-		for {
-			if token.Type != t.TOKEN_ATTRIBUTE_NAME && token.Type != t.TOKEN_LEFT_DELIMITER {
-				return htlx.HtlxElement{}, errors.New("Invalid token type")
-			}
+		// Handle Attributes
+		if token.Type == t.TOKEN_ATTRIBUTE_NAME {
+			var attributes [][2]t.Token
+			for {
+				if token.Type != t.TOKEN_ATTRIBUTE_NAME {
+					break
+				}
 
-			// Hanlde left delimiter
-			if token.Type == t.TOKEN_LEFT_DELIMITER {
+				// Create a new attribute (fixed-size array of 3 tokens)
+				var attribute [2]t.Token
+
+				// Process attribute name
+				attribute[0] = token
 				token = <-tokens
-				break
+				if token.Type != t.TOKEN_EQUAL_SIGN {
+					return htlx.HtlxElement{}, errors.New("Expected '=' after attribute name")
+				}
+
+				// Process equal sign
+				token = <-tokens
+				if token.Type != t.TOKEN_ATTRIBUTE_VALUE {
+					return htlx.HtlxElement{}, errors.New("Expected attribute value after '='")
+				}
+
+				// Process attribute value
+				attribute[1] = token
+				token = <-tokens
+
+				attributes = append(attributes, attribute)
 			}
 
-			// Create a new attribute (fixed-size array of 3 tokens)
-			var attribute [2]t.Token
-
-			// Process attribute name
-			attribute[0] = token
-			token = <-tokens
-			if token.Type != t.TOKEN_EQUAL_SIGN {
-				return htlx.HtlxElement{}, errors.New("Expected '=' after attribute name")
+			for _, attribute := range attributes {
+				elem.Attributes = append(elem.Attributes, htlx.HtlxAttribute{Key: attribute[0].Value, Value: attribute[1].Value})
 			}
-
-			// Process equal sign
-			token = <-tokens
-			if token.Type != t.TOKEN_ATTRIBUTE_VALUE {
-				return htlx.HtlxElement{}, errors.New("Expected attribute value after '='")
-			}
-
-			// Process attribute value
-			attribute[1] = token
-			token = <-tokens
-
-			attributes = append(attributes, attribute)
 		}
 
-		for _, attribute := range attributes {
-			elem.Attributes = append(elem.Attributes, htlx.HtlxAttribute{Key: attribute[0].Value, Value: attribute[1].Value})
+		// Hanlde left delimiter
+		if token.Type == t.TOKEN_LEFT_DELIMITER {
+			token = <-tokens
+		} else {
+			return htlx.HtlxElement{}, errors.New("Invalid token type")
 		}
 
 		if token.Type == t.TOKEN_ELEMENT_TEXTVALUE {
 			elem.Value = token.Value
+			token = <-tokens
 		}
 
-		output.AppenddChildElement(tabs, &elem)
+		result.AppenddChildElement(tabs, &elem)
 
 		if token.Type == t.TOKEN_EOF {
 			break
 		}
 	}
-	return output, nil
+	return result, nil
 }

@@ -21,7 +21,7 @@ func main() {
 		fmt.Println("Error:", fmt.Errorf("reading file: %w", err))
 	}
 
-	l := lexer.BeginLexing(os.Args[1], string(file))
+	l := lexer.NewLexer(os.Args[1], string(file))
 	go lexer.LexBegin(l)
 
 	r, err := parser.ParseTokens(l.Tokens)
@@ -32,7 +32,7 @@ func main() {
 
 	//r.Value = ""
 	fmt.Print(r)
-	//printTokens()
+	printTokens()
 }
 
 func printTokens() {
@@ -42,13 +42,14 @@ func printTokens() {
 		fmt.Println("Error:", fmt.Errorf("reading file: %w", err))
 	}
 
-	l := lexer.BeginLexing(os.Args[1], string(file))
+	l := lexer.NewLexer(os.Args[1], string(file))
 
 	go func() {
 		for token := range l.Tokens {
 			fmt.Printf("%v \t\"%v\"\n", token.Type.String(), strings.TrimSpace(token.Value))
 			if token.Type == lexertoken.TOKEN_EOF {
 				close(l.Tokens)
+				return
 			}
 		}
 	}()
