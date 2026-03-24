@@ -86,7 +86,7 @@ func ParseTokens(tokens chan lexertoken.Token) (htlx.HtlxElement, error) {
 			elem.Value = token.Value
 		}
 
-		output.ChildElements = append(output.ChildElements, elem)
+		output.AppenddChildElement(tabs, &elem)
 
 		if token.Type == t.TOKEN_EOF {
 			break

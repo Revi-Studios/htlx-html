@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"htlx/cmd/lexer/lexer"
+	"htlx/cmd/lexer/lexertoken"
 	"htlx/cmd/parser"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -19,19 +21,6 @@ func main() {
 		fmt.Println("Error:", fmt.Errorf("reading file: %w", err))
 	}
 
-	// l := lexer.BeginLexing(os.Args[1], string(file))
-
-	// go func() {
-	// 	for token := range l.Tokens {
-	// 		fmt.Printf("%v \t\"%v\"\n", token.Type.String(), strings.TrimSpace(token.Value))
-	// 		if token.Type == lexertoken.TOKEN_EOF {
-	// 			close(l.Tokens)
-	// 		}
-	// 	}
-	// }()
-
-	// lexer.LexBegin(l)
-
 	l := lexer.BeginLexing(os.Args[1], string(file))
 	go lexer.LexBegin(l)
 
@@ -41,5 +30,28 @@ func main() {
 		fmt.Print(err)
 	}
 
+	//r.Value = ""
 	fmt.Print(r)
+	//printTokens()
+}
+
+func printTokens() {
+	file, err := os.ReadFile(os.Args[1])
+
+	if err != nil {
+		fmt.Println("Error:", fmt.Errorf("reading file: %w", err))
+	}
+
+	l := lexer.BeginLexing(os.Args[1], string(file))
+
+	go func() {
+		for token := range l.Tokens {
+			fmt.Printf("%v \t\"%v\"\n", token.Type.String(), strings.TrimSpace(token.Value))
+			if token.Type == lexertoken.TOKEN_EOF {
+				close(l.Tokens)
+			}
+		}
+	}()
+
+	lexer.LexBegin(l)
 }

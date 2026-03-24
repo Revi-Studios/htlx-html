@@ -23,21 +23,11 @@ func (this HtlxAttribute) String() string {
 }
 
 // Walkes the element tree and appends the [elem] to the last child of the target element
-func (this *HtlxElement) AppendToLatestChildElement(depth int, elem *HtlxElement) {
-	if this == nil || depth < 0 {
+func (this *HtlxElement) AppenddChildElement(depth int, elem *HtlxElement) {
+	if depth <= 0 || len(this.ChildElements) == 0 {
+		this.ChildElements = append(this.ChildElements, *elem)
 		return
 	}
 
-	// 1. Target depth reached
-	if depth == 0 {
-		// Append the address of the copy
-		this.ChildElements = append(this.ChildElements, &elem)
-		return
-	}
-
-	// 2. Dig deeper into the last child
-	if len(this.ChildElements) > 0 {
-		lastIdx := len(this.ChildElements) - 1
-		this.ChildElements[lastIdx].AppendToLatestChildElement(depth-1, elem)
-	}
+	this.ChildElements[len(this.ChildElements)-1].AppenddChildElement(depth-1, elem)
 }

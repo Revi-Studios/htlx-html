@@ -4,7 +4,7 @@ import "htlx/cmd/lexer/lexertoken"
 
 type LexFn func(*Lexer) LexFn
 
-func BeginLexing(name, input string) *Lexer {
+func NewLexer(name, input string) *Lexer {
 	l := &Lexer{
 		Name:   name,
 		Input:  input,
