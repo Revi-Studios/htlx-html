@@ -2,9 +2,12 @@ package parser
 
 import (
 	"errors"
+	"fmt"
+	"htlx/cmd/lexer/lexer"
 	"htlx/cmd/lexer/lexertoken"
 	t "htlx/cmd/lexer/lexertoken"
 	"htlx/cmd/parser/model/htlx"
+	"strings"
 )
 
 // // Parses HTLX into normal HTML
@@ -99,4 +102,83 @@ func ParseTokens(tokens chan lexertoken.Token) (htlx.HtlxElement, error) {
 		}
 	}
 	return result, nil
+}
+
+func Parse(str string) (string, error) {
+	l := lexer.NewLexer(str)
+	go lexer.LexBegin(l)
+
+	htlx, err := ParseTokens(l.Tokens)
+
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	var r []string
+
+	parseElement(htlx, &r, 0)
+
+	return strings.Join(r, "\n"), nil
+}
+
+func parseElement(this htlx.HtlxElement, strs *[]string, padding int) {
+	str := strings.Builder{}
+
+	for range padding {
+		str.WriteString("\t")
+	}
+
+	base := str.String()
+
+	switch true {
+	case this.Type == "input":
+		str.Reset()
+		str.WriteString(base)
+		str.WriteString("<")
+		str.WriteString(this.Type)
+		str.WriteString(" />")
+		*strs = append(*strs, str.String())
+
+	case len(this.ChildElements) == 0:
+		str.Reset()
+		str.WriteString(base)
+		str.WriteString("<")
+		str.WriteString(this.Type)
+		str.WriteString(">")
+		str.WriteString(strings.TrimSpace(this.Value))
+		str.WriteString("</")
+		str.WriteString(this.Type)
+		str.WriteString(">")
+		*strs = append(*strs, str.String())
+
+	default:
+		str.Reset()
+		str.WriteString(base)
+		str.WriteString("<")
+		str.WriteString(this.Type)
+		str.WriteString(">")
+
+		*strs = append(*strs, str.String())
+		if this.Value != "" {
+			str.Reset()
+			str.WriteString(base)
+			str.WriteString("\t")
+			str.WriteString(strings.TrimSpace(this.Value))
+			*strs = append(*strs, str.String())
+		}
+		if len(this.ChildElements) > 0 {
+			for _, child := range this.ChildElements {
+				parseElement(child, strs, padding+1)
+			}
+		}
+
+		str.Reset()
+		str.WriteString(base)
+		str.WriteString("</")
+		str.WriteString(this.Type)
+		str.WriteString(">")
+
+		*strs = append(*strs, str.String())
+	}
+
 }

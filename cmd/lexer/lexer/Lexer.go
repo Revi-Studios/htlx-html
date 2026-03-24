@@ -7,7 +7,6 @@ import (
 )
 
 type Lexer struct {
-	Name   string
 	Input  string
 	Tokens chan lexertoken.Token
 

@@ -10,6 +10,7 @@ func LexElementTextValue(lexer *Lexer) LexFn {
 		ch := lexer.Next()
 		if string(ch) == lexertoken.NEWLINE {
 			if strings.TrimSpace(lexer.Input[lexer.Start:lexer.Pos]) != "" {
+				lexer.Pos -= len(lexertoken.NEWLINE)
 				lexer.Emit(lexertoken.TOKEN_ELEMENT_TEXTVALUE)
 			}
 			return LexBegin(lexer)
