@@ -133,17 +133,17 @@ func parseElement(this htlx.HtlxElement, strs *[]string, padding int) {
 	switch true {
 	case this.Type == "input":
 		str.Reset()
-		writeStrings(&str, base, "<", this.Type, " />")
+		writeStrings(&str, base, "<", this.Type, parseAttributes(this.Attributes), " />")
 		*strs = append(*strs, str.String())
 
 	case len(this.ChildElements) == 0:
 		str.Reset()
-		writeStrings(&str, base, "<", this.Type, ">", strings.TrimSpace(this.Value), "</", this.Type, ">")
+		writeStrings(&str, base, "<", this.Type, parseAttributes(this.Attributes), ">", strings.TrimSpace(this.Value), "</", this.Type, ">")
 		*strs = append(*strs, str.String())
 
 	default:
 		str.Reset()
-		writeStrings(&str, base, "<", this.Type, ">")
+		writeStrings(&str, base, "<", this.Type, parseAttributes(this.Attributes), ">")
 
 		*strs = append(*strs, str.String())
 		if this.Value != "" {
@@ -169,4 +169,14 @@ func writeStrings(builder *strings.Builder, strs ...string) {
 	for _, str := range strs {
 		builder.WriteString(str)
 	}
+}
+
+func parseAttributes(attributes []htlx.HtlxAttribute) string {
+	builder := strings.Builder{}
+
+	for _, attribute := range attributes {
+		writeStrings(&builder, " ", attribute.Key, "=\"", attribute.Value, "\"", " ")
+	}
+
+	return builder.String()
 }
