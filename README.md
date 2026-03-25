@@ -1,10 +1,16 @@
-# htlx
+# HTLX
 
 A cleaner and more readable way of writing html
 
+## Why?
+
+Html can sometimes be hard to read and take time to write. Htlx wants to change that by simplifying the language. It will be both nicer to the eyes and storage.
+
 ## Idea:
 
-The htlx tool will convert htlx into normal html. When building web apps primaraly on the server, this tool can convert the files on the fly
+The tool will convert HTLX into normal HTML. When building web apps primaraly on the server, this tool can convert the files on the fly
+
+**HTLX**
 
 ```htlx
 button> Hello
@@ -20,6 +26,8 @@ div cors=true>
 ```
 
 ->
+
+**HTML**
 
 ```html
 <button>Hello</button>
@@ -37,11 +45,11 @@ div cors=true>
 </div>
 ```
 
-|              | **HTML**  | **HTLX**  | **Differens** |
-| :----------- | :-------- | :-------- | :------------ |
-| _Lines_      | 13 lines  | 10 lines  | ~23%          |
-| _Characters_ | 221 char  | 154 char  | ~30%          |
-| _File Size_  | 194 bytes | 164 bytes | ~15%          |
+|              | **HTML**  | **HTLX**  | **Difference** |
+| :----------- | :-------- | :-------- | :------------- |
+| _Lines_      | 13 lines  | 10 lines  | ~23%           |
+| _Characters_ | 221 char  | 154 char  | ~30%           |
+| _File Size_  | 194 bytes | 164 bytes | ~15%           |
 
 > **Result:**
 >
