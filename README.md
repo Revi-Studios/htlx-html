@@ -19,27 +19,35 @@ div cors=true>
         input>
 ```
 
-Converts to ->
+->
 
 ```html
 <button>Hello</button>
 <div cors="true">
-    <li>World</li>
-    <flow style="margin:20px">
-        <p>Things can be</p>
-        <p>Good!</p>
-    </flow>
-    <stack>
-        <input />
-        <p>D</p>
-        <input />
-    </stack>
+	<li>World</li>
+	<flow style="margin:20px">
+		<p>Things can be</p>
+		<p>Good!</p>
+	</flow>
+	<stack>
+		<input />
+		<p>D</p>
+		<input />
+	</stack>
 </div>
 ```
 
-**Result:**
+|              | **HTML**  | **HTLX**  | **Differens** |
+| :----------- | :-------- | :-------- | :------------ |
+| _Lines_      | 13 lines  | 10 lines  | ~23%          |
+| _Characters_ | 221 char  | 154 char  | ~30%          |
+| _File Size_  | 194 bytes | 164 bytes | ~15%          |
 
-- Cleaner code
-- More readable code
-- ~23% less lines of code
-- ~30% less characters
+> **Result:**
+>
+> _Using HTLX will result in:_
+>
+> - Cleaner code
+> - More readable code
+> - ~23% less lines of code
+> - ~30% less characters

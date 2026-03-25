@@ -14,6 +14,10 @@ func LexBegin(lexer *Lexer) LexFn {
 			return LexTab(lexer)
 		}
 
+		if ch == lexertoken.EOF {
+			lexer.Emit(lexertoken.TOKEN_EOF)
+		}
+
 		if !unicode.IsSpace(ch) {
 			lexer.Decrement()
 			return LexElementType(lexer)

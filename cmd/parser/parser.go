@@ -20,7 +20,7 @@ import (
 func ParseTokens(tokens chan lexertoken.Token) (htlx.HtlxElement, error) {
 	defer close(tokens)
 
-	result := htlx.HtlxElement{Type: "root"}
+	result := htlx.HtlxElement{Type: "root", Value: "sdjwkoiasi32n12nkasdkj21"}
 	var token lexertoken.Token
 	token = <-tokens
 
@@ -131,6 +131,13 @@ func parseElement(this htlx.HtlxElement, strs *[]string, padding int) {
 	base := str.String()
 
 	switch true {
+	case this.Type == "root" && this.Value == "sdjwkoiasi32n12nkasdkj21":
+		if len(this.ChildElements) > 0 {
+			for _, child := range this.ChildElements {
+				parseElement(child, strs, padding+1)
+			}
+		}
+
 	case this.Type == "input":
 		str.Reset()
 		writeStrings(&str, base, "<", this.Type, parseAttributes(this.Attributes), " />")
@@ -175,7 +182,11 @@ func parseAttributes(attributes []htlx.HtlxAttribute) string {
 	builder := strings.Builder{}
 
 	for _, attribute := range attributes {
-		writeStrings(&builder, " ", attribute.Key, "=\"", attribute.Value, "\"", " ")
+		switch true {
+		case attribute.Key == "st":
+			attribute.Key = "style"
+		}
+		writeStrings(&builder, " ", attribute.Key, "=\"", attribute.Value, "\"")
 	}
 
 	return builder.String()
