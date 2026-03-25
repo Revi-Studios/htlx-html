@@ -116,7 +116,7 @@ func Parse(str string) (string, error) {
 
 	var r []string
 
-	parseElement(htlx, &r, 0)
+	parseElement(htlx, &r, -1)
 
 	return strings.Join(r, "\n"), nil
 }
@@ -133,37 +133,22 @@ func parseElement(this htlx.HtlxElement, strs *[]string, padding int) {
 	switch true {
 	case this.Type == "input":
 		str.Reset()
-		str.WriteString(base)
-		str.WriteString("<")
-		str.WriteString(this.Type)
-		str.WriteString(" />")
+		writeStrings(&str, base, "<", this.Type, " />")
 		*strs = append(*strs, str.String())
 
 	case len(this.ChildElements) == 0:
 		str.Reset()
-		str.WriteString(base)
-		str.WriteString("<")
-		str.WriteString(this.Type)
-		str.WriteString(">")
-		str.WriteString(strings.TrimSpace(this.Value))
-		str.WriteString("</")
-		str.WriteString(this.Type)
-		str.WriteString(">")
+		writeStrings(&str, base, "<", this.Type, ">", strings.TrimSpace(this.Value), "</", this.Type, ">")
 		*strs = append(*strs, str.String())
 
 	default:
 		str.Reset()
-		str.WriteString(base)
-		str.WriteString("<")
-		str.WriteString(this.Type)
-		str.WriteString(">")
+		writeStrings(&str, base, "<", this.Type, ">")
 
 		*strs = append(*strs, str.String())
 		if this.Value != "" {
 			str.Reset()
-			str.WriteString(base)
-			str.WriteString("\t")
-			str.WriteString(strings.TrimSpace(this.Value))
+			writeStrings(&str, base, "\t", strings.TrimSpace(this.Value))
 			*strs = append(*strs, str.String())
 		}
 		if len(this.ChildElements) > 0 {
@@ -173,12 +158,15 @@ func parseElement(this htlx.HtlxElement, strs *[]string, padding int) {
 		}
 
 		str.Reset()
-		str.WriteString(base)
-		str.WriteString("</")
-		str.WriteString(this.Type)
-		str.WriteString(">")
+		writeStrings(&str, base, "</", this.Type, ">")
 
 		*strs = append(*strs, str.String())
 	}
 
+}
+
+func writeStrings(builder *strings.Builder, strs ...string) {
+	for _, str := range strs {
+		builder.WriteString(str)
+	}
 }
